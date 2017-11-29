@@ -11,6 +11,7 @@ from scipy.io import loadmat
 from scipy.sparse import issparse
 
 from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 from os import path
 from collections import Counter
@@ -34,9 +35,15 @@ def __random_walk__(G, path_length, start, alpha=0, rand=random.Random()):
 
     while len(path) < path_length:
         cur = path[-1]
-        if len(G.neighbors(cur)) > 0:
+        
+        # --- Correction ---
+        # Convertir l'itérateur G.neighbors() en liste
+        neighbors = list(G.neighbors(cur)) 
+        
+        if len(neighbors) > 0:
             if rand.random() >= alpha:
-                path.append(rand.choice(G.neighbors(cur)))
+                # Utiliser la liste 'neighbors' ici
+                path.append(rand.choice(neighbors)) 
             else:
                 path.append(path[0])
         else:
@@ -143,11 +150,11 @@ def write_walks_to_disk(G, filebase, num_paths, path_length, alpha=0, rand=rando
     else:
         paths_per_worker = [len(list(filter(lambda z: z!= None, [y for y in x]))) for x in grouper(int(num_paths / num_workers)+1, range(1, num_paths+1))]
 
-    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         for size, file_, ppw in zip(executor.map(count_lines, files_list), files_list, paths_per_worker):
             args_list.append((ppw, path_length, alpha, random.Random(rand.randint(0, 2**31)), file_))
 
-    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         for file_ in executor.map(_write_walks_to_disk, args_list):
             files.append(file_)
 

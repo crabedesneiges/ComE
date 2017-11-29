@@ -2,3 +2,10 @@
 build
 data
 .idea
+/cifar-10-batches-py
+cifar-10-python.tar.gz
+Dblp_alpha-0.1_beta-0.1_ws-10_neg-5_lr-0.025_icom-219_ind-219_k-5_ds-0.0.txt
+Dblp_alpha-10.0_beta-5.0_ws-10_neg-5_lr-0.025_icom-219_ind-219_k-5_ds-0.0.txt
+Dblp_pre-training.bin
+/builddata/cifar-10-python.tar.gz
+data/Dblp_pre-training.bin
